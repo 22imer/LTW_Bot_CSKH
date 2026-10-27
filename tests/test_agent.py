@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 from cskh.agent import AgentError, build_system_prompt, run_agent
 from cskh.db import Database
-from cskh.tools import ToolContext, execute_tool
+from cskh.tools import ToolContext
 
 STORES = {"s1": {"name": "N", "address": "A", "phone": "+84900000000", "hours": "8-9"}}
 
@@ -47,7 +47,7 @@ class AgentTests(unittest.IsolatedAsyncioTestCase):
         async def send_contact(store_id):
             self.sent.append(store_id)
 
-        self.ctx = ToolContext(1, STORES, "https://shop.example.com", self.db, send_contact)
+        self.ctx = ToolContext(1, STORES, self.db, send_contact)
 
     async def asyncTearDown(self):
         await self.db.close()
@@ -89,26 +89,16 @@ class AgentTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(await cur.fetchall(), [("complaint", "chậm")])
 
     async def test_tool_rounds_are_capped_then_forced_to_text(self):
-        looping = [msg(tool_calls=[tool_call(f"c{i}", "get_web_link", {"page": "pickup"})]) for i in range(3)]
+        looping = [msg(tool_calls=[tool_call(f"c{i}", "list_stores", {})]) for i in range(3)]
         llm = FakeLLM([*looping, msg("xong")])
         self.assertEqual(await self.run_agent(llm), "xong")
         self.assertEqual([c["tools"] for c in llm.calls], [True, True, True, False])
 
-    async def test_web_link_builds_page_url_and_rejects_unknown_page(self):
-        cases = {"pickup": "https://shop.example.com/pickup",
-                 "reservation": "https://shop.example.com/reservations",
-                 "member": "https://shop.example.com/member"}
-        for page, url in cases.items():
-            with self.subTest(page=page):
-                result = json.loads(await execute_tool("get_web_link", json.dumps({"page": page}), self.ctx))
-                self.assertEqual(result["url"], url)
-        bad = json.loads(await execute_tool("get_web_link", json.dumps({"page": "admin"}), self.ctx))
-        self.assertIn("error", bad)
-
-    def test_system_prompt_embeds_shop_and_faq_verbatim(self):
-        prompt = build_system_prompt("Mây Cafe", "Quy tắc {x} tại quầy\n")
+    def test_system_prompt_embeds_faq_and_menu_verbatim(self):
+        prompt = build_system_prompt("Mây Cafe", "Quy tắc {x} tại quầy\n", "- Latte (M 50.000đ) {y}\n")
         self.assertIn("Mây Cafe", prompt)
-        self.assertTrue(prompt.endswith("Quy tắc {x} tại quầy"))
+        self.assertIn("Quy tắc {x} tại quầy", prompt)
+        self.assertTrue(prompt.endswith("- Latte (M 50.000đ) {y}"))
 
     async def test_system_prompt_is_sent_first(self):
         llm = FakeLLM([msg("ok")])

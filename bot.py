@@ -35,10 +35,12 @@ async def _purge_loop(db: Database, days: int) -> None:
 def build_application(settings: Settings) -> Application:
     settings.validate()
     stores = load_stores(settings.stores_file)
-    try:
-        faq = settings.faq_file.read_text(encoding="utf-8")
-    except OSError as exc:
-        raise RuntimeError(f"Cannot read FAQ file {settings.faq_file}: {exc}") from exc
+    texts: dict[str, str] = {}
+    for label, path in (("FAQ", settings.faq_file), ("menu", settings.menu_file)):
+        try:
+            texts[label] = path.read_text(encoding="utf-8")
+        except OSError as exc:
+            raise RuntimeError(f"Cannot read {label} file {path}: {exc}") from exc
     db = Database(settings.db_path)
     deps = Deps(
         settings=settings,
@@ -50,7 +52,8 @@ def build_application(settings: Settings) -> Application:
             base_url=settings.llm_base_url,
             default_headers={"User-Agent": "cskh-telegram-bot/1.0"},
         ),
-        system_prompt=build_system_prompt(settings.shop_name, faq),
+        system_prompt=build_system_prompt(settings.shop_name, texts["FAQ"], texts["menu"]),
+        menu_text=texts["menu"],
     )
 
     async def post_init(application: Application) -> None:

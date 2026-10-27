@@ -14,9 +14,6 @@ logger = logging.getLogger(__name__)
 
 FEEDBACK_CATEGORIES = ("complaint", "suggestion", "other")
 MAX_FEEDBACK_CHARS = 1000
-# Paths on the shop website (QR-Order-Pay). /menu needs a table QR session, so remote
-# customers browse the menu through /pickup instead.
-WEB_PAGES = {"pickup": "/pickup", "reservation": "/reservations", "member": "/member"}
 
 TOOL_SCHEMAS: list[dict[str, Any]] = [
     {
@@ -44,20 +41,6 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
     {
         "type": "function",
         "function": {
-            "name": "get_web_link",
-            "description": "Lấy đường dẫn website của quán. page=pickup: xem menu, giá và đặt "
-            "mang đi/đặt trước; page=reservation: đặt bàn trước; page=member: đăng ký hoặc "
-            "đăng nhập thành viên (điểm, voucher).",
-            "parameters": {
-                "type": "object",
-                "properties": {"page": {"type": "string", "enum": list(WEB_PAGES)}},
-                "required": ["page"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
             "name": "submit_feedback",
             "description": "Ghi nhận góp ý hoặc khiếu nại của khách để quán xem xét.",
             "parameters": {
@@ -79,7 +62,6 @@ SendContact = Callable[[str], Awaitable[None]]
 class ToolContext:
     user_id: int
     stores: Stores
-    menu_url: str
     db: Database
     send_contact: SendContact
 
@@ -120,12 +102,6 @@ async def execute_tool(name: str, raw_arguments: str, ctx: ToolContext) -> str:
             logger.exception("Could not send contact card")
             return _result(error="Không gửi được danh thiếp.")
         return _result(ok=True, note="Đã gửi danh thiếp liên hệ cho khách.")
-
-    if name == "get_web_link":
-        page = str(arguments.get("page", ""))
-        if page not in WEB_PAGES:
-            return _result(error="Trang không hợp lệ.", valid_pages=list(WEB_PAGES))
-        return _result(url=ctx.menu_url.rstrip("/") + WEB_PAGES[page])
 
     if name == "submit_feedback":
         category = str(arguments.get("category", "other"))

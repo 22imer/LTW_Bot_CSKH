@@ -13,7 +13,7 @@ flowchart TD
     L -->|No| R["Fixed refusal message"]
     L -->|Yes| H["Load last 10 messages from SQLite"]
     H --> M["LLM call with tool schemas"]
-    M -->|tool_calls, max 3 rounds| X["Execute tool: list_stores / get_store_contact / get_web_link / submit_feedback"]
+    M -->|tool_calls, max 3 rounds| X["Execute tool: list_stores / get_store_contact / submit_feedback"]
     X --> M
     M -->|final text| S["Save user+assistant messages, reply as plain text"]
     M -->|error or timeout| E["Apology message, nothing saved"]
@@ -32,13 +32,13 @@ Two buttons (addresses, contact) call stores data directly, avoiding LLM cost an
 `send_contact` with an international number plus vCard. Telegram rejects `tel:` in inline-button URLs. Contact messages cannot be edited, so menus navigating away from them delete and resend.
 
 ### ADR-04 — Environment configuration
-Secrets and endpoints (`BOT_TOKEN`, `LLM_API_KEY`, `LLM_MODEL`, `LLM_BASE_URL`, `MENU_URL`) come from env via `python-dotenv`.
+Secrets and endpoints (`BOT_TOKEN`, `LLM_API_KEY`, `LLM_MODEL`, `LLM_BASE_URL`) and `SHOP_NAME` come from env via `python-dotenv`.
 
 ### ADR-05 — Store configuration in JSON
 Branches live in `data/stores.json`, validated at startup (required fields, `+` phone).
 
 ### ADR-06 — LLM agent with a closed tool set
-**Decision:** `cskh/agent.py` runs a bounded loop (3 tool rounds, then a forced text answer) over the OpenAI SDK with a configurable `base_url`. Tools in `cskh/tools.py`: `list_stores`, `get_store_contact`, `get_web_link` (pickup/reservation/member pages of the shop website), `submit_feedback`. No other capability is reachable. The system prompt is built at startup from `data/faq.md` (shop operating rules) and `SHOP_NAME`.
+**Decision:** `cskh/agent.py` runs a bounded loop (3 tool rounds, then a forced text answer) over the OpenAI SDK with a configurable `base_url`. Tools in `cskh/tools.py`: `list_stores`, `get_store_contact`, `submit_feedback`. No other capability is reachable. The system prompt is built at startup from `SHOP_NAME`, `data/faq.md` (shop operating rules) and `data/menu.txt` (menu exported from QR-Order-Pay as plain text). `/menu` sends the same file to the customer, rendered by `cskh/menu.py`. There is no website, so the bot never sends links.
 **Reason:** Provider-agnostic, cheap to demo, and facts about branches come from tools rather than model memory.
 **Guardrails:** system prompt restricts scope and role changes; 10 msgs/min/user; 1000 chars/message; LLM output is sent as plain text (no `parse_mode`) because it is untrusted; LLM failure yields an apology and stores nothing.
 
@@ -67,6 +67,7 @@ The earlier starter forwarded customer text to `AGENT_CHAT_ID` and had a chat mo
 - Updates are processed sequentially, so one slow LLM call delays other customers. Fine for demo load.
 - Rate limiter state is in memory and resets on restart.
 - Only text is handled; media gets a fixed reply.
-- Example store data and phone numbers are placeholders; `MENU_URL` defaults to `shop.example.com`.
+- Example store data and phone numbers are placeholders.
+- `data/menu.txt` is a static export of QR-Order-Pay demo data; prices and availability are not live.
 - `data/faq.md` is derived from the shop's QR-Order-Pay docs; update it whenever the shop's rules change.
 - Real Telegram and LLM calls are not covered by automated tests.

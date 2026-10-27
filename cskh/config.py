@@ -9,25 +9,15 @@ PLACEHOLDER_TOKEN = "replace_with_your_bot_token"
 PLACEHOLDER_LLM_KEY = "replace_with_your_llm_api_key"
 
 
-def normalize_url(url: str) -> str:
-    """Telegram and browsers need a scheme; default to https."""
-    url = url.strip()
-    if not url:
-        return url
-    if "://" not in url:
-        return f"https://{url}"
-    return url
-
-
 @dataclass(frozen=True)
 class Settings:
     bot_token: str
     llm_api_key: str
     llm_model: str
     llm_base_url: str | None
-    menu_url: str
     shop_name: str
     faq_file: Path
+    menu_file: Path
     stores_file: Path
     db_path: Path
     history_limit: int = 10
@@ -45,9 +35,9 @@ class Settings:
             llm_api_key=os.getenv("LLM_API_KEY", "").strip(),
             llm_model=os.getenv("LLM_MODEL", "gpt-4o-mini").strip(),
             llm_base_url=os.getenv("LLM_BASE_URL", "").strip() or None,
-            menu_url=normalize_url(os.getenv("MENU_URL", "shop.example.com")),
             shop_name=os.getenv("SHOP_NAME", "Mây Cafe").strip() or "Mây Cafe",
             faq_file=Path(os.getenv("FAQ_FILE", "data/faq.md")),
+            menu_file=Path(os.getenv("MENU_FILE", "data/menu.txt")),
             stores_file=Path(os.getenv("STORES_FILE", "data/stores.json")),
             db_path=Path(os.getenv("DB_PATH", "data/cskh.sqlite3")),
         )

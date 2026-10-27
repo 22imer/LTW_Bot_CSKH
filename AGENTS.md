@@ -5,15 +5,15 @@ Build a customer-support Telegram bot for a cafe chain with `python-telegram-bot
 
 ## Current behavior
 - `/start` shows two inline shortcuts: store addresses and store contact (no LLM).
-- Any text message goes to an LLM agent (OpenAI-compatible API) that can only call 4 tools: `list_stores`, `get_store_contact`, `get_web_link`, `submit_feedback`. The agent persona is "Mây"; shop rules come from `data/faq.md`.
+- Any text message goes to an LLM agent (OpenAI-compatible API) that can only call 3 tools: `list_stores`, `get_store_contact`, `submit_feedback`. The agent persona is "Mây"; shop rules come from `data/faq.md` and the menu from `data/menu.txt`, both loaded into the system prompt at startup. The bot never sends website links.
 - Context = last 10 messages per user in SQLite (`data/cskh.sqlite3`: `users`, `messages`, `feedback`); history purged after 30 days.
-- Telegram command menu (hamburger button): `/start`, `/diachi` (addresses), `/lienhe` (contact picker). Registered at startup by `publish_command_menu`.
+- Telegram command menu (hamburger button): `/start`, `/menu` (menu text), `/diachi` (addresses), `/lienhe` (contact picker). Registered at startup by `publish_command_menu`.
 - No human agent handoff. Non-text messages get a fixed reply.
 - Limits: 10 msgs/min/user, 1000 chars, 3 tool rounds per turn.
 
 ## Non-negotiable implementation rules
 1. Use async handlers and `await` for Telegram API calls.
-2. Read `BOT_TOKEN`, `LLM_API_KEY`, `LLM_MODEL`, `LLM_BASE_URL`, `MENU_URL`, `SHOP_NAME` from environment variables; never commit secrets.
+2. Read `BOT_TOKEN`, `LLM_API_KEY`, `LLM_MODEL`, `LLM_BASE_URL`, `SHOP_NAME` from environment variables; never commit secrets.
 3. Do not use `tel:` in an InlineKeyboardButton URL. Use `send_contact` with an international-format number (`+84...`).
 4. Telegram contact messages cannot be edited like text messages. When navigating away from one, delete it if possible and send a new text menu.
 5. Keep store data in `data/stores.json`, not scattered throughout handlers.

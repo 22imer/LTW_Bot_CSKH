@@ -16,11 +16,19 @@ from telegram import (
 )
 from telegram.constants import ChatAction
 from telegram.error import TelegramError
-from telegram.ext import Application, ContextTypes
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
 
 from .agent import AgentError, ChatClient, run_agent
 from .config import Settings
 from .db import Database
+from .menu import menu_messages
 from .ratelimit import RateLimiter
 from .stores import Stores, build_vcard, format_addresses_html
 from .tools import ToolContext
@@ -47,6 +55,7 @@ class Deps:
     limiter: RateLimiter
     llm: ChatClient
     system_prompt: str
+    menu_text: str
 
 
 def get_deps(context: ContextTypes.DEFAULT_TYPE) -> Deps:
@@ -146,6 +155,17 @@ async def address_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     )
 
 
+async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    message = update.effective_message
+    if message is None:
+        return
+    chunks = menu_messages(get_deps(context).menu_text)
+    for index, chunk in enumerate(chunks):
+        # Main-menu buttons only under the last chunk.
+        markup = main_menu_keyboard() if index == len(chunks) - 1 else None
+        await message.reply_text(chunk, reply_markup=markup, parse_mode="HTML")
+
+
 async def contact_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = update.effective_message
     if message is None:
@@ -233,7 +253,6 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     tool_ctx = ToolContext(
         user_id=user.id,
         stores=deps.stores,
-        menu_url=settings.menu_url,
         db=deps.db,
         send_contact=_contact_sender(context.bot, message, deps.stores),
     )
@@ -283,6 +302,7 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 # lowercase ASCII, hence /diachi and /lienhe.
 BOT_COMMANDS = [
     BotCommand("start", "Mở menu chính của Mây"),
+    BotCommand("menu", "Xem thực đơn và giá"),
     BotCommand("diachi", "Địa chỉ và giờ mở cửa các cơ sở"),
     BotCommand("lienhe", "Nhận số điện thoại của cơ sở"),
 ]
@@ -298,11 +318,10 @@ async def publish_command_menu(bot: Bot) -> None:
 
 
 def register_handlers(application: Application) -> None:
-    from telegram.ext import CallbackQueryHandler, CommandHandler, MessageHandler, filters
-
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("diachi", address_command))
     application.add_handler(CommandHandler("lienhe", contact_command))
+    application.add_handler(CommandHandler("menu", menu_command))
     application.add_handler(CallbackQueryHandler(button_handler))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler))
     application.add_handler(

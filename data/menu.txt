@@ -1,0 +1,44 @@
+THỰC ĐƠN MÂY CAFE (dữ liệu mẫu xuất từ hệ thống đặt món QR-Order-Pay)
+Giá tính theo size. Tuỳ chọn khi gọi: đường 0/30/50/70/100%, đá (không đá, ít đá, đá thường).
+
+## Cà phê
+- Espresso Mây (S 35.000đ / M 45.000đ / L 55.000đ): Espresso đậm đà, hậu chocolate, phù hợp buổi sáng. [có caffeine, không sữa, đề xuất]
+- Bạc Xỉu Đá (M 38.000đ): Bạc xỉu truyền thống, sữa đặc, cà phê robusta. [có caffeine, có sữa, đề xuất] Topping thêm: Pudding trứng.
+- Cà phê Dừa (M 45.000đ): Cà phê Việt kết hợp cốt dừa béo, ít ngọt. [có caffeine, có sữa, đề xuất]
+- Americano (M 32.000đ / L 42.000đ): Espresso pha loãng với nước nóng, hậu nhẹ. [có caffeine, không sữa]
+- Cappuccino (M 48.000đ): Espresso, sữa nóng, bọt sữa mịn. [có caffeine, có sữa]
+- Cold Brew Cam (L 52.000đ): Cold brew ủ 12 giờ, kết hợp cam tươi. [có caffeine, không sữa]
+- Latte Hazelnut (M 52.000đ): Latte vị hạt phỉ, ít đường. [có caffeine, có sữa]
+- Mocha (M 52.000đ): Espresso, sữa, sốt chocolate. [có caffeine, có sữa] Topping thêm: Kem cheese.
+
+## Trà & Trà sữa
+- Trà Đào Cam Sả (M 42.000đ / L 52.000đ): Trào đào tươi, cam vàng, sả thơm. [không caffeine, không sữa, đề xuất] Topping thêm: Trân châu trắng.
+- Trà Vải Hoa Hồng (M 45.000đ): Trà vải, syrup hoa hồng, thanh nhẹ. [không caffeine, không sữa] Topping thêm: Thạch cà phê.
+- Trà Sữa Oolong (M 45.000đ): Trà oolong ủ lạnh, sữa tươi, vị chát dịu. [có caffeine, có sữa] Topping thêm: Pudding trứng.
+- Trà Xanh Matcha Latte (M 55.000đ): Matcha Nhật, sữa tươi, không ngọt đường. [có caffeine, có sữa]
+- Hồng Trà Sữa (M 38.000đ): Hồng trà sữa truyền thống, đá viên. [có caffeine, có sữa]
+
+## Đồ xay & Sinh tố
+- Sinh tố Bơ (L 50.000đ): Bơ sáp Đắk Lắk, sữa đặc, đá xay mịn. [không caffeine, có sữa]
+- Sinh tố Xoài (L 48.000đ): Xoài chín, sữa tươi, đá xay. [không caffeine, có sữa]
+- Sinh tố Dâu (L 55.000đ): Dâu tây Đà Lạt, sữa chua, mật ong. [không caffeine, có sữa]
+- Smoothie Berry (L 60.000đ): Việt quất, dâu, chuối, sữa chua. [không caffeine, có sữa]
+
+## Nước ép
+- Nước ép Cam (M 40.000đ): Cam tươi vắt, không đường. [không caffeine, không sữa, đề xuất]
+- Nước ép Dưa hấu (M 35.000đ): Dưa hấu tươi mát, không đá. [không caffeine, không sữa]
+- Nước ép Cà rốt (M 45.000đ): Cà rốt, cam, gừng nhẹ. [không caffeine, không sữa]
+
+## Bánh ngọt
+- Bánh Croissant (35.000đ): Bánh sừng bò bơ Pháp, nướng trong ngày. [không caffeine, có sữa]
+- Bánh Tiramisu (55.000đ): Tiramisu cà phê, mascarpone, cacao. [có caffeine, có sữa]
+- Bánh Mousse Chanh dây (48.000đ): Mousse chanh dây chua nhẹ, vỏ biscuit. [không caffeine, có sữa]
+- Bánh Cookie Socola (28.000đ): Cookie chip socola đen, giòn ngoài mềm trong. [không caffeine, có sữa]
+
+## Topping (giá thêm)
+- Kem cheese: +15.000đ
+- Pudding trứng: +12.000đ
+- Sốt caramel: +7.000đ
+- Thạch cà phê: +9.000đ
+- Trân châu trắng: +8.000đ
+- Trân châu đen: +8.000đ

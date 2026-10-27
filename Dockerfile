@@ -11,7 +11,7 @@ RUN python -m pip install --no-cache-dir -r requirements.txt
 RUN useradd --create-home --uid 1000 bot && mkdir -p /app/data && chown bot:bot /app/data
 COPY --chown=bot:bot bot.py ./
 COPY --chown=bot:bot cskh ./cskh
-COPY --chown=bot:bot data/stores.json data/faq.md ./data/
+COPY --chown=bot:bot data/stores.json data/faq.md data/menu.txt ./data/
 
 USER bot
 CMD ["python", "bot.py"]
