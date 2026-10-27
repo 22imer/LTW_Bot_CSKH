@@ -1,0 +1,9 @@
+services:
+  bot:
+    build: .
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      # stores.json (editable) and cskh.sqlite3 (history, feedback).
+      # Container uid is 1000; ./data must be writable by it on Linux/WSL.
+      - ./data:/app/data

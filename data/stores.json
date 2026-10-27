@@ -1,0 +1,20 @@
+{
+  "hn_1": {
+    "name": "Cơ sở 1 - Cầu Giấy, Hà Nội",
+    "address": "Số 123 Xuân Thủy, Quận Cầu Giấy, Hà Nội",
+    "phone": "+84901234567",
+    "hours": "08:30 - 22:00"
+  },
+  "hn_2": {
+    "name": "Cơ sở 2 - Đống Đa, Hà Nội",
+    "address": "Số 45 Thái Hà, Quận Đống Đa, Hà Nội",
+    "phone": "+84902345678",
+    "hours": "08:30 - 22:00"
+  },
+  "hcm_1": {
+    "name": "Cơ sở 3 - Quận 1, TP.HCM",
+    "address": "Số 789 Nguyễn Huệ, Quận 1, TP.HCM",
+    "phone": "+84903456789",
+    "hours": "09:00 - 22:30"
+  }
+}
