@@ -28,6 +28,7 @@ from telegram.ext import (
 from .agent import AgentError, ChatClient, run_agent
 from .config import Settings
 from .db import Database
+from .knowledge import KnowledgeBase
 from .menu import menu_messages
 from .ratelimit import RateLimiter
 from .stores import Stores, build_vcard, format_addresses_html
@@ -56,6 +57,7 @@ class Deps:
     llm: ChatClient
     system_prompt: str
     menu_text: str
+    knowledge: KnowledgeBase
 
 
 def get_deps(context: ContextTypes.DEFAULT_TYPE) -> Deps:
@@ -254,6 +256,7 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         user_id=user.id,
         stores=deps.stores,
         db=deps.db,
+        knowledge=deps.knowledge,
         send_contact=_contact_sender(context.bot, message, deps.stores),
     )
     try:

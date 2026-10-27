@@ -5,7 +5,7 @@ Build a customer-support Telegram bot for a cafe chain with `python-telegram-bot
 
 ## Current behavior
 - `/start` shows two inline shortcuts: store addresses and store contact (no LLM).
-- Any text message goes to an LLM agent (OpenAI-compatible API) that can only call 3 tools: `list_stores`, `get_store_contact`, `submit_feedback`. The agent persona is "Mây"; shop rules come from `data/faq.md` and the menu from `data/menu.txt`, both loaded into the system prompt at startup. The bot never sends website links.
+- Any text message goes to an LLM agent (OpenAI-compatible API) that can only call 4 tools: `list_stores`, `get_store_contact`, `search_knowledge`, `submit_feedback`. The agent persona is "Mây". Menu and shop rules are NOT in the prompt: they are retrieved by `search_knowledge` (RAG over `data/menu.txt` and `data/faq.md`, SQLite FTS5, `cskh/knowledge.py`). The bot never sends website links.
 - Context = last 10 messages per user in SQLite (`data/cskh.sqlite3`: `users`, `messages`, `feedback`); history purged after 30 days.
 - Telegram command menu (hamburger button): `/start`, `/menu` (menu text), `/diachi` (addresses), `/lienhe` (contact picker). Registered at startup by `publish_command_menu`.
 - No human agent handoff. Non-text messages get a fixed reply.

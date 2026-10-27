@@ -13,6 +13,7 @@ from cskh.agent import build_system_prompt
 from cskh.config import Settings
 from cskh.db import Database
 from cskh.handlers import DEPS_KEY, Deps, publish_command_menu, register_handlers
+from cskh.knowledge import KnowledgeBase
 from cskh.ratelimit import RateLimiter
 from cskh.stores import load_stores
 
@@ -52,8 +53,9 @@ def build_application(settings: Settings) -> Application:
             base_url=settings.llm_base_url,
             default_headers={"User-Agent": "cskh-telegram-bot/1.0"},
         ),
-        system_prompt=build_system_prompt(settings.shop_name, texts["FAQ"], texts["menu"]),
+        system_prompt=build_system_prompt(settings.shop_name),
         menu_text=texts["menu"],
+        knowledge=KnowledgeBase.from_texts(texts["FAQ"], texts["menu"]),
     )
 
     async def post_init(application: Application) -> None:

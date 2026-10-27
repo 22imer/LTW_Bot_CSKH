@@ -12,7 +12,7 @@ Giá tính theo size. Tuỳ chọn khi gọi: đường 0/30/50/70/100%, đá (k
 - Mocha (M 52.000đ): Espresso, sữa, sốt chocolate. [có caffeine, có sữa] Topping thêm: Kem cheese.
 
 ## Trà & Trà sữa
-- Trà Đào Cam Sả (M 42.000đ / L 52.000đ): Trào đào tươi, cam vàng, sả thơm. [không caffeine, không sữa, đề xuất] Topping thêm: Trân châu trắng.
+- Trà Đào Cam Sả (M 42.000đ / L 52.000đ): Trà đào tươi, cam vàng, sả thơm. [không caffeine, không sữa, đề xuất] Topping thêm: Trân châu trắng.
 - Trà Vải Hoa Hồng (M 45.000đ): Trà vải, syrup hoa hồng, thanh nhẹ. [không caffeine, không sữa] Topping thêm: Thạch cà phê.
 - Trà Sữa Oolong (M 45.000đ): Trà oolong ủ lạnh, sữa tươi, vị chát dịu. [có caffeine, có sữa] Topping thêm: Pudding trứng.
 - Trà Xanh Matcha Latte (M 55.000đ): Matcha Nhật, sữa tươi, không ngọt đường. [có caffeine, có sữa]

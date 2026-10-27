@@ -5,9 +5,9 @@ Bot chăm sóc khách hàng cho hệ thống cafe. Khách nhắn tin tự do, m�
 ## Tính năng
 - `/start`: lời chào và 2 nút nhanh (địa chỉ, liên hệ). Nút gọi thẳng dữ liệu, không tốn lượt LLM.
 - Nhắn văn bản bất kỳ: agent trả lời tiếng Việt, nhớ 10 tin nhắn gần nhất.
-- 3 tool + 1: `list_stores`, `get_store_contact` (gửi danh thiếp điện thoại), `submit_feedback` (ghi góp ý/khiếu nại vào SQLite). Không có tool gửi link web.
-- Agent xưng "Mây", trả lời về thực đơn, giá và cách quán vận hành dựa trên `data/menu.txt` và `data/faq.md` (nạp vào prompt khi bot khởi động).
-- Menu lệnh (nút ☰ cạnh ô nhập tin): `/start`, `/menu` (thực đơn và giá), `/diachi` (địa chỉ và giờ mở cửa), `/lienhe` (chọn cơ sở nhận danh thiếp). Bot tự đăng ký menu này khi khởi động.
+- 4 tool: `list_stores`, `get_store_contact` (gửi danh thiếp điện thoại), `search_knowledge` (RAG: tra thực đơn và cách quán vận hành), `submit_feedback` (ghi góp ý/khiếu nại vào SQLite). Không có tool gửi link web.
+- Agent xưng "Mây". Thực đơn, giá và quy trình của quán không nằm trong prompt mà được tra bằng RAG từ `data/menu.txt` và `data/faq.md`.
+- Menu lệnh (nút ☰ cạnh ô nhập tin): `/start`, `/menu` (thực đơn và giá, mỗi nhóm có icon, ghi chú ⚡ caffeine, 🌿 không caffeine, 🥛 sữa, 🚫🥛 không sữa, ⭐ quán đề xuất, giá rút gọn kiểu 35k), `/diachi` (địa chỉ và giờ mở cửa), `/lienhe` (chọn cơ sở nhận danh thiếp). Bot tự đăng ký menu này khi khởi động.
 - Tin không phải văn bản (ảnh, voice, sticker): trả lời cố định, không gọi LLM.
 - Giới hạn: 10 tin/phút/khách, 1000 ký tự/tin, tối đa 3 vòng tool mỗi lượt. LLM lỗi thì xin lỗi khách.
 - Lịch sử hội thoại giữ 30 ngày rồi tự xóa.
@@ -25,8 +25,9 @@ cp .env.example .env
 
 Sửa `data/faq.md` khi quán đổi cách vận hành (giờ hẹn, chính sách hủy, thanh toán). Đây là nguồn duy nhất agent dùng để trả lời về cách quán hoạt động; sửa xong chạy lại `docker compose restart`.
 
-## Thực đơn dạng text
-Thực đơn xuất sẵn từ dữ liệu mẫu của repo [QR-Order-Pay](https://github.com/longdxam/QR-Order-Pay) ra `data/menu.txt` (món, size, giá, topping). `/menu` gửi nguyên file này cho khách, agent dùng nó để trả lời về món và giá. Sửa file khi đổi menu rồi chạy `docker compose restart`.
+## RAG (tra cứu tài liệu)
+`data/menu.txt` và `data/faq.md` được cắt thành 42 đoạn nhỏ (mỗi món, mỗi topping, mỗi mục quy định là một đoạn) và lập chỉ mục bằng SQLite FTS5 trong bộ nhớ khi bot khởi động (`cskh/knowledge.py`). Khi khách hỏi, agent gọi `search_knowledge` với vài từ khóa, nhận tối đa 6 đoạn xếp theo BM25, rồi viết câu trả lời từ các đoạn đó. Tìm kiếm không phân biệt dấu ("tra dao" ra "Trà Đào") nhưng chỉ khớp theo từ, không hiểu nghĩa; agent bù bằng cách gọi lại với từ khóa khác. `/menu` vẫn gửi nguyên file menu cho khách. Sửa hai file này rồi chạy `docker compose restart` để lập lại chỉ mục. Menu mẫu xuất từ dữ liệu của repo [QR-Order-Pay](https://github.com/longdxam/QR-Order-Pay).
+
 
 ## Chạy bằng Docker
 ```bash

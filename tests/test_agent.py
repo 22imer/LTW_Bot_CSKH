@@ -6,7 +6,8 @@ from types import SimpleNamespace
 
 from cskh.agent import AgentError, build_system_prompt, run_agent
 from cskh.db import Database
-from cskh.tools import ToolContext
+from cskh.knowledge import KnowledgeBase
+from cskh.tools import ToolContext, execute_tool
 
 STORES = {"s1": {"name": "N", "address": "A", "phone": "+84900000000", "hours": "8-9"}}
 
@@ -47,7 +48,11 @@ class AgentTests(unittest.IsolatedAsyncioTestCase):
         async def send_contact(store_id):
             self.sent.append(store_id)
 
-        self.ctx = ToolContext(1, STORES, self.db, send_contact)
+        kb = KnowledgeBase.from_texts(
+            "Thanh toán\n- Thanh toán tại quầy.\n- Quán chưa có chuyển khoản tự động.\n",
+            "## Cà phê\n- Cappuccino (M 48.000đ): Espresso, sữa nóng.\n",
+        )
+        self.ctx = ToolContext(1, STORES, self.db, kb, send_contact)
 
     async def asyncTearDown(self):
         await self.db.close()
@@ -94,11 +99,17 @@ class AgentTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.run_agent(llm), "xong")
         self.assertEqual([c["tools"] for c in llm.calls], [True, True, True, False])
 
-    def test_system_prompt_embeds_faq_and_menu_verbatim(self):
-        prompt = build_system_prompt("Mây Cafe", "Quy tắc {x} tại quầy\n", "- Latte (M 50.000đ) {y}\n")
+    async def test_search_knowledge_returns_matching_chunks_and_handles_no_match(self):
+        found = json.loads(await execute_tool("search_knowledge", json.dumps({"query": "cappuccino gia"}), self.ctx))
+        self.assertEqual([r["source"] for r in found["results"]], ["menu"])
+        self.assertIn("48.000đ", found["results"][0]["text"])
+        empty = json.loads(await execute_tool("search_knowledge", json.dumps({"query": "xyz"}), self.ctx))
+        self.assertEqual(empty["results"], [])
+
+    def test_system_prompt_names_the_shop_and_the_retrieval_tool(self):
+        prompt = build_system_prompt("Mây Cafe")
         self.assertIn("Mây Cafe", prompt)
-        self.assertIn("Quy tắc {x} tại quầy", prompt)
-        self.assertTrue(prompt.endswith("- Latte (M 50.000đ) {y}"))
+        self.assertIn("search_knowledge", prompt)
 
     async def test_system_prompt_is_sent_first(self):
         llm = FakeLLM([msg("ok")])
